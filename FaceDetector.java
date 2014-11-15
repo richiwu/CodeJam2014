@@ -17,7 +17,7 @@ import org.opencv.objdetect.CascadeClassifier;
 
 public class FaceDetector {
 	
-	private static String convertToJPG(String inputFile){
+	public static String convertToJPG(String inputFile){
 		File input = new File(inputFile);  
 		BufferedImage im = null;
 		try {
