@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.io.*;
@@ -11,38 +12,27 @@ public class ImageComparator {
 	
 	private BufferedImage imgA = null;
 	private BufferedImage imgB = null;
-	private BufferedImage imComb = null;
-	private int horz = 10;  // # horizontal blocks
-	private int vert = 10;  // # vertical blocks
-	private int sens = 10;  // sensitivity
+	private int horz = 5;  // # horizontal blocks
+	private int vert = 5;  // # vertical blocks
+	private int sens = 1;  // sensitivity
 	
 	public static void main(String[] args){
 	
-		try{
-		String output1 = FaceDetector.getFace("13_1_.gif");
-		String output2 = FaceDetector.getFace("14_1_.gif");
-		ImageCompare ic = new ImageCompare(output1, output2);
-		ic.compare();
-		
-		
-		
-		}
-		catch(IOException e){
-			System.out.println("could not find pic ");
-		}
-		
-		
 		
 		
 	}
 	
 	
 	public ImageComparator(String file1, String file2) {
-		this.imgA = imageToBufferedImage(loadJPG(file1));
-		this.imgB = imageToBufferedImage(loadJPG(file2));
+		String temp1 = convertToJPG(file1);
+		String temp2 = convertToJPG(file2);
+		this.imgA = imageToBufferedImage(loadJPG(temp1));
+		this.imgB = imageToBufferedImage(loadJPG(temp2));
 	}
 	public ImageComparator(String file1) {
-		this.imgA = imageToBufferedImage(loadJPG(file1));
+		String temp = convertToJPG(file1);
+		System.out.println("conv : " + temp);
+		this.imgA = imageToBufferedImage(loadJPG(temp));
 	}
 
 	public boolean compare(){
@@ -58,7 +48,6 @@ public class ImageComparator {
 		
 		for (int i = 0; i < vert; i++){
 			for (int j = 0; j < horz; j++){
-				
 				int brightA = getAverageBrightness(imgA.getSubimage(j*horz, i*vert, horz - 1, vert - 1));
 				int brightB = getAverageBrightness(imgB.getSubimage(j*horz, i*vert, horz - 1, vert - 1));
 				int diff = Math.abs(brightA - brightB);
@@ -69,8 +58,29 @@ public class ImageComparator {
 		}
 		return match;
 	}
+	
+	public static String convertToJPG(String inputFile){
+		File input = new File(inputFile);  
+		BufferedImage im = null;
+		try {
+			im = ImageIO.read(input);
+		} catch (IOException e) {
+			System.out.println("Error converting gif to jpg: error reading input");
+			e.printStackTrace();
+		} 
+		String fileOutput = inputFile.replaceAll(".gif", ".jpg");
+		File output = new File(fileOutput);
+		try {
+			ImageIO.write(im, "jpg", output);
+		} catch (IOException e) {
+			System.out.println("Error converting gif to jpg: error writing to output");
+			e.printStackTrace();
+		} 
+		return output.getPath();
+	}
 	public void setComparisonImage(String fileName){
-		this.imgB = imageToBufferedImage(loadJPG(fileName));
+		String temp = convertToJPG(fileName);
+		this.imgB = imageToBufferedImage(loadJPG(temp));
 	}
 	protected void scaleImages(){
 		
